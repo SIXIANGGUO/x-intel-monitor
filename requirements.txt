@@ -1,1 +1,5 @@
-feedparser>=6.0.0
+# Core dependency — RSS feed parsing
+feedparser
+
+# Optional: TikHub SDK (for paid API version)
+# pip install tikhub

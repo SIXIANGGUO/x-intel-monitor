@@ -1,4 +1,17 @@
-__pycache__/
-*.pyc
+# Environment and secrets
+.env
+TIKHUB_API_KEY=*
+
+# Python runtime output (generated at runtime, never commit these)
+written-ids.json
+fetched-tweets.json
 x大佬-written-ids.json
 x大佬-fetched-tweets.json
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# macOS
+.DS_Store
