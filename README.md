@@ -43,7 +43,7 @@ cd x-intel-monitor
 ### 2. 安装依赖
 
 ```bash
-pip install feedparser
+pip3 install feedparser
 ```
 
 ### 3. 运行采集
@@ -78,7 +78,7 @@ python x_rss_fetcher.py
 |--|----------------------|------------------------|
 | 费用 | 免费 | 有（~¥0.001/请求） |
 | 覆盖 | 原文推文，漏转发/QT | 全覆盖（原文+转发+引用） |
-| 配置 | `pip install feedparser` 即可 | 需注册 tikhub.io + API Key |
+| 配置 | `pip3 install feedparser` 即可 | 需注册 tikhub.io + API Key |
 | 推荐场景 | 日常监控首选 | 想抓全量时补充 |
 
 ## 完整自动监控配置
@@ -87,7 +87,7 @@ python x_rss_fetcher.py
 
 1. 把 `x_rss_fetcher.py` 的输出路径改为绝对路径（默认是脚本同目录下 `fetched-tweets.json`）
 2. 在 Hermes 中配置 cron job，定时运行采集 + AI 文案生成
-3. 文案写作标准参考 [ljg 写作原则](https://github.com/nickarora01/ljg-writes)，核心是：踩坑者视角、不当翻译/旁观者、文案按账号语言分流
+3. 文案写作标准参考 [ljg 写作原则](https://hermes-agent.nousresearch.com)，核心是：踩坑者视角、不当翻译/旁观者、文案按账号语言分流
 
 详细配置方法见完整文章：*如何利用 Hermes 快速获取 X 上的大佬推文*
 
