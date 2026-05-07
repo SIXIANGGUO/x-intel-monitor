@@ -1,18 +1,35 @@
 # X Intel Monitor
 
-用 Hermes Agent 自动监控 X/Twitter 大佬推文的完整方案。基于 xgo.ing 免费 RSS，数据采集 → 内容过滤 → AI 文案生成 → Discord 推送，全自动运行。
+用 Hermes Agent 自动监控 X/Twitter 大佬推文的完整方案。数据采集 → AI 选题过滤 → 文案生成 → Discord 推送，全自动运行。
+
+**核心定位**：帮人省掉「刷 timeline」这件苦力活，把精力留给真正需要判断的内容。
 
 ## 架构
 
 ```
-xgo.ing RSS (160个账号)
+BestBlogs OPML (160个AI圈账号)
         ↓
-  x_rss_fetcher.py   ← 并发抓取，48h窗口，ID去重
+xgo.ing RSS 订阅服务（免费，无需 API Key）
         ↓
- Hermes Agent        ← 选题判断 + 文案写作 + 格式输出
+x_rss_fetcher.py   ← 并发抓取，48h窗口，ID去重
         ↓
-   Discord           ← 推送格式化好的评论文+转发文
+Hermes Agent（配置 ljg 写作原则）  ← 选题判断 + 文案生成
+        ↓
+Discord 频道       ← 推送格式化好的文案
 ```
+
+## 数据源致谢
+
+- **账号列表**：[BestBlogs RSS Twitters OPML](https://github.com/ginobefun/BestBlogs) by [@ginobefun](https://x.com/ginobefun) — 160 个 AI 研究者/Lab/Builder/VC 的 Twitter 账号，已按语言（中英文）分类
+- **RSS 服务**：xgo.ing — 将 Twitter 账号转 RSS 输出的免费服务
+
+## 核心依赖
+
+| 依赖 | 说明 |
+|------|------|
+| [BestBlogs OPML](https://github.com/ginobefun/BestBlogs) | 账号来源，160个AI圈账号 |
+| [xgo.ing](https://xgo.ing) | RSS 转换服务，零配置 |
+| [ljg 写作原则](https://hermes-agent.nousresearch.com) | 文案写作标准，踩坑者视角，非旁观者腔 |
 
 ## 快速开始
 
@@ -35,94 +52,51 @@ pip install feedparser
 python x_rss_fetcher.py
 ```
 
-输出：`x大佬-fetched-tweets.json`，包含最近48小时内所有账号的新推文。
+输出：`fetched-tweets.json`，包含最近48小时内所有账号的新推文（已去重）。
 
-### 4. 配置 Hermes Cron
+## 开源内容说明
 
-把以下 cron prompt 配置到 Hermes，定时触发（建议每4小时）：
+本 repo 仅开源 `x_rss_fetcher.py`（xgo.ing RSS 采集方案），完全免费，零配置。
 
-```markdown
-## 身份
+**未开源的部分**：
+- TikHub SDK 采集脚本（`twitter_fetch_concurrent.py`）— 含 API Key，不适合公开
+- Hermes cron prompt 和文案写作规则 — 是自己的迭代成果，未整理开源
+- 监控账号列表 — 含特定账号选择逻辑，是自己的整理结果
 
-你是踩过坑的从业者，不是记者，不是翻译。
-你不是在报道「大佬发了什么」——你是在讲「我走过类似的弯路，这个推文让我停下来想了什么」。
-
----
-
-## 硬规则
-
-- 标题：【账号名】一句话，不超过20字
-- 链接放代码块外面
-- 结尾不停「值得关注」，停在最后一个具体发现
-
----
-
-## 选题标准
-
-1. 反直觉观点 > 行业判断 > 真实困惑 > 技术辩论空间
-2. 实用工具/产品体验 > 论文研究
-3. 有具体参数/场景/案例 > 概念讨论
-4. 纯产品发布、情绪碎碎念、链接分享 → 跳过
-
----
-
-## 转发文案门槛
-
-英文账号：400-800字，有实质内容才写，写不够400字直接跳过
-中文账号：100-200字，有判断就说清楚
-
----
-
-## 采集
-
-先跑采集脚本读取数据，再逐条判断是否值得写：
-
-有好内容才出文案，没内容输出：`暂无更新，下轮见 👋`
-
----
-
-## 输出格式
-
-每条文案结构：
-```txt
-【标题】
-
-评论文正文（给 timeline 里的陌生人看，要有判断、有角度）
-
----
-
-转发文正文（给点进原文的人看，要短、要有钩子）
-
-https://x.com/xxx/status/123456
-```
-
-评论文和转发文全部放在 txt 代码块里，链接放代码块外面。
-```
+如需 TikHub SDK 版本，需自行注册 tikhub.io 获取 API Key 后参考 `x_rss_fetcher.py` 的逻辑自行实现。
 
 ## 文件说明
 
 | 文件 | 说明 |
 |------|------|
-| `x_rss_fetcher.py` | 主力采集脚本，xgo.ing RSS 并发抓取，48h窗口，ID去重 |
-| `requirements.txt` | Python 依赖 |
+| `x_rss_fetcher.py` | 采集脚本，xgo.ing RSS 并发抓取，48h窗口，ID去重 |
+| `requirements.txt` | Python 依赖（仅 feedparser） |
 
-## 数据源
+## 两套抓取方案对比
 
-- **RSS 源**：[BestBlogs RSS Twitters OPML](https://github.com/ginobefun/BestBlogs/blob/main/BestBlogs_RSS_Twitters.opml)（160个AI圈账号）
-- **RSS 服务**：xgo.ing（免费，无需 API Key）
-- **覆盖账号**：模型厂官方（OpenAI/Anthropic/DeepSeek...）、核心人物（karpathy/sama/ylecun...）、产品/应用（huggingface/cursor_ai...）、Infra工具（Docker/GitHub/Vercel...）
-
-## 两套方案对比
-
-| | xgo.ing RSS（开源这套） | TikHub SDK |
-|--|----------------------|-----------|
+| | xgo.ing RSS（开源这套） | TikHub SDK（需单独配置） |
+|--|----------------------|------------------------|
 | 费用 | 免费 | 有（~¥0.001/请求） |
-| 覆盖 | 原文推文，不含转发/QT | 全覆盖 |
-| 配置 | 只需 Python + feedparser | 需注册 + API Key |
-| 稳定性 | 高（纯HTTP） | 可能遇到429限速 |
+| 覆盖 | 原文推文，漏转发/QT | 全覆盖（原文+转发+引用） |
+| 配置 | `pip install feedparser` 即可 | 需注册 tikhub.io + API Key |
+| 推荐场景 | 日常监控首选 | 想抓全量时补充 |
 
-实战建议：先用这套 RSS 方案跑起来。如果发现漏掉了转发类内容，再加 TikHub SDK 做补充。
+## 完整自动监控配置
 
-## 开源地址
+本项目只包含数据采集层。要跑完整流水线（采集 → 写作 → 推送），需要配合 Hermes Agent：
 
-https://github.com/SIXIANGGUO/x-intel-monitor
+1. 把 `x_rss_fetcher.py` 的输出路径改为绝对路径（默认是脚本同目录下 `fetched-tweets.json`）
+2. 在 Hermes 中配置 cron job，定时运行采集 + AI 文案生成
+3. 文案写作标准参考 [ljg 写作原则](https://github.com/nickarora01/ljg-writes)，核心是：踩坑者视角、不当翻译/旁观者、文案按账号语言分流
+
+详细配置方法见完整文章：*如何利用 Hermes 快速获取 X 上的大佬推文*
+
+## 开源协议
+
+MIT License。
+
+## 相关项目
+
+- [BestBlogs](https://github.com/ginobefun/BestBlogs) — AI/Startup/VC Twitter 账号 OPML 维护者
+- [ljg 写作原则](https://hermes-agent.nousresearch.com) — 本系统文案写作标准来源，踩坑者视角，非旁观者腔
+- [Hermes Agent](https://hermes-agent.nousresearch.com) — 本系统运行的 AI Agent 框架
