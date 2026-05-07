@@ -99,7 +99,12 @@
 python3 ~/.hermes/scripts/x_rss_fetcher.py
 ```
 
-读取 `~/.hermes/scripts/x大佬-fetched-tweets.json`，里面有 `new_count` 和 `new_tweets` 列表。
+读取 `~/.hermes/scripts/x大佬-fetched-tweets.json`，这是一个推文数组，每条格式：
+```json
+{"id": "...", "text": "...", "author": "账号名", "author_name": "显示名",
+ "created_at": "RFC2822时间", "is_chinese": true/false, "url": "https://x.com/..."}
+```
+按 `created_at` 倒序排列，只需处理前 20 条。
 
 ---
 

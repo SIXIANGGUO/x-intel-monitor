@@ -44,8 +44,8 @@ def _strip_html(text: str) -> str:
     text = text.rstrip()
     return text
 
-DEDUP_FILE = Path(__file__).parent / "written-ids.json"
-OUTPUT_FILE = Path(__file__).parent / "fetched-tweets.json"
+DEDUP_FILE = Path.home() / ".hermes" / "scripts" / "x大佬-written-ids.json"
+OUTPUT_FILE = Path.home() / ".hermes" / "scripts" / "x大佬-fetched-tweets.json"
 OPML_URL = "https://raw.githubusercontent.com/ginobefun/BestBlogs/main/BestBlogs_RSS_Twitters.opml"
 
 # Time window: tweets newer than this are kept (default 48h)
