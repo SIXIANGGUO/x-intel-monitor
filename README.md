@@ -82,6 +82,27 @@ python3 scripts/twitter_fetch_tikhub.py
 
 在 cron job 的 `deliver` 字段填入你的 Discord channel ID。
 
+## 可选：Hermes Tweet 原生 X/Twitter 路线
+
+现有 RSS 抓取流程可以继续作为默认数据源。如果你希望让 Hermes Agent 直接调用
+X/Twitter 插件做后续搜索、监控和人工确认后的发布动作，可以安装
+[Hermes Tweet](https://github.com/Xquik-dev/hermes-tweet)：
+
+```bash
+hermes plugins install Xquik-dev/hermes-tweet --enable
+```
+
+在 Hermes Agent 环境里设置 `XQUIK_API_KEY` 后，Hermes Tweet 会提供
+`tweet_explore`、`tweet_read` 和 `tweet_action` 工具：
+
+- 搜索 tweets 和 search Twitter/X，用关键词跟进 AI 话题
+- 读取 tweet replies、look up users，并在发布后 monitor tweets
+- 导出 followers，辅助判断账号来源和扩散质量
+- 经过人工确认后 post tweets、post replies 或 send DMs
+
+建议无人值守 cron 只调用搜索、读取、监控和导出类动作，把发推、回复和 DM 留给
+人工确认流程。
+
 ## 核心依赖
 
 | 依赖 | 说明 |
